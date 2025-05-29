@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Mappa Eventi Locali</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map { height: 100vh; width: 100vw; margin: 0; padding: 0; }
+    body, html { margin:0; padding:0; height: 100%; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map');
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: 'Map data © OpenStreetMap contributors'
+    }).addTo(map);
+
+    function fallbackView() {
+      map.setView([42.5, 12.5], 6);
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          map.setView([lat, lng], 13);
+          L.marker([lat, lng])
+            .addTo(map)
+            .bindPopup("Ti trovi qui")
+            .openPopup();
+        },
+        (error) => {
+          console.warn("Errore geolocalizzazione:", error);
+          fallbackView();
+        }
+      );
+    } else {
+      fallbackView();
+    }
+
+    fetch('event.json')
+      .then(response => {
+        if (!response.ok) throw new Error('Errore nel caricamento JSON: ' + response.status);
+        return response.json();
+      })
+      .then(eventi => {
+        eventi.forEach(evento => {
+          if (evento.lat && evento.lng) {
+            L.marker([evento.lat, evento.lng])
+              .addTo(map)
+              .bindPopup(`<b>${evento.titolo}</b><br>${evento.descrizione}`);
+          }
+        });
+      })
+      .catch(err => console.error('Errore nel caricamento degli eventi:', err));
+  </script>
+</body>
+</html>
