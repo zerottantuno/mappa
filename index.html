@@ -1,5 +1,4 @@
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
@@ -15,6 +14,21 @@
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
+    // Icone personalizzate
+    const myLocationIcon = L.icon({
+      iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -32]
+    });
+
+    const eventIcon = L.icon({
+      iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -32]
+    });
+
     const map = L.map('map');
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -31,7 +45,7 @@
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
           map.setView([lat, lng], 13);
-          L.marker([lat, lng])
+          L.marker([lat, lng], { icon: myLocationIcon })
             .addTo(map)
             .bindPopup("Ti trovi qui")
             .openPopup();
@@ -53,7 +67,7 @@
       .then(eventi => {
         eventi.forEach(evento => {
           if (evento.lat && evento.lng) {
-            L.marker([evento.lat, evento.lng])
+            L.marker([evento.lat, evento.lng], { icon: eventIcon })
               .addTo(map)
               .bindPopup(`<b>${evento.titolo}</b><br>${evento.descrizione}`);
           }
